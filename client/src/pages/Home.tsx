@@ -1,5 +1,5 @@
-import LouvreGame from "@/components/LouvreGame";
+import Dashboard from "@/components/Dashboard";
 
 export default function Home() {
-  return <LouvreGame />;
+  return <Dashboard />;
 }
