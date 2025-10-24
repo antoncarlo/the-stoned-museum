@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
+import TouchControls from "./TouchControls";
 
 /**
  * Layout 3D del Louvre Museum in stile low poly
@@ -30,9 +31,22 @@ export default function LouvreMuseum3D({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLocked, setIsLocked] = useState(false);
   const [instructions, setInstructions] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const touchMoveRef = useRef({ x: 0, y: 0 });
+  const touchLookRef = useRef({ deltaX: 0, deltaY: 0 });
 
   useEffect(() => {
     if (!containerRef.current) return;
+
+    // Detect mobile
+    const checkMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+    setIsMobile(checkMobile);
+    if (checkMobile) {
+      setInstructions(false);
+      setIsLocked(true); // Auto-start on mobile
+    }
 
     // Setup Scene
     const scene = new THREE.Scene();
@@ -55,26 +69,30 @@ export default function LouvreMuseum3D({
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     containerRef.current.appendChild(renderer.domElement);
 
-    // Pointer Lock Controls
-    const controls = new PointerLockControls(camera, renderer.domElement);
+    // Pointer Lock Controls (only for desktop)
+    let controls: PointerLockControls | null = null;
+    
+    if (!checkMobile) {
+      controls = new PointerLockControls(camera, renderer.domElement);
 
-    controls.addEventListener("lock", () => {
-      setIsLocked(true);
-      setInstructions(false);
-    });
+      controls.addEventListener("lock", () => {
+        setIsLocked(true);
+        setInstructions(false);
+      });
 
-    controls.addEventListener("unlock", () => {
-      setIsLocked(false);
-      setInstructions(true);
-    });
+      controls.addEventListener("unlock", () => {
+        setIsLocked(false);
+        setInstructions(true);
+      });
 
-    // Click to start
-    const handleClick = () => {
-      if (!isLocked) {
-        controls.lock();
-      }
-    };
-    renderer.domElement.addEventListener("click", handleClick);
+      // Click to start
+      const handleClick = () => {
+        if (!isLocked && controls) {
+          controls.lock();
+        }
+      };
+      renderer.domElement.addEventListener("click", handleClick);
+    }
 
     // Movement
     const moveSpeed = 0.15;
@@ -377,6 +395,7 @@ export default function LouvreMuseum3D({
         const right = new THREE.Vector3();
         right.crossVectors(camera.up, direction).normalize();
 
+        // Desktop keyboard controls
         if (keys["w"]) {
           camera.position.add(direction.multiplyScalar(moveSpeed));
         }
@@ -388,6 +407,26 @@ export default function LouvreMuseum3D({
         }
         if (keys["d"]) {
           camera.position.add(right.multiplyScalar(-moveSpeed));
+        }
+
+        // Mobile touch controls
+        if (checkMobile) {
+          const touchMove = touchMoveRef.current;
+          if (touchMove.x !== 0 || touchMove.y !== 0) {
+            camera.position.add(direction.multiplyScalar(-touchMove.y * moveSpeed * 2));
+            camera.position.add(right.multiplyScalar(touchMove.x * moveSpeed * 2));
+          }
+
+          const touchLook = touchLookRef.current;
+          if (touchLook.deltaX !== 0 || touchLook.deltaY !== 0) {
+            const euler = new THREE.Euler(0, 0, 0, "YXZ");
+            euler.setFromQuaternion(camera.quaternion);
+            euler.y -= touchLook.deltaX * 0.002;
+            euler.x -= touchLook.deltaY * 0.002;
+            euler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, euler.x));
+            camera.quaternion.setFromEuler(euler);
+            touchLookRef.current = { deltaX: 0, deltaY: 0 };
+          }
         }
 
         // Mantieni altezza camera
@@ -419,8 +458,9 @@ export default function LouvreMuseum3D({
     return () => {
       window.removeEventListener("resize", onWindowResize);
       window.removeEventListener("click", onMouseClick);
-      renderer.domElement.removeEventListener("click", handleClick);
-      controls.dispose();
+      if (controls) {
+        controls.dispose();
+      }
       renderer.dispose();
       if (containerRef.current) {
         containerRef.current.removeChild(renderer.domElement);
@@ -428,9 +468,21 @@ export default function LouvreMuseum3D({
     };
   }, [isLocked, artworks, onArtworkClick]);
 
+  function handleTouchMove(x: number, y: number) {
+    touchMoveRef.current = { x, y };
+  }
+
+  function handleTouchLook(deltaX: number, deltaY: number) {
+    touchLookRef.current = { deltaX, deltaY };
+  }
+
   return (
     <div ref={containerRef} className="relative w-full h-screen">
-      {instructions && (
+      {isMobile && isLocked && (
+        <TouchControls onMove={handleTouchMove} onLook={handleTouchLook} />
+      )}
+      
+      {instructions && !isMobile && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-10">
           <div className="text-center text-white p-8 bg-gradient-to-br from-purple-900/90 to-pink-900/90 rounded-lg border-2 border-purple-500">
             <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
