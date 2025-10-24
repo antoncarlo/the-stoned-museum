@@ -1,4 +1,4 @@
-import LouvreMuseum3D from "@/components/LouvreMuseum3D";
+import LouvreMuseum3DNew from "@/components/LouvreMuseum3DNew";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,7 +55,7 @@ export default function Museum() {
 
   return (
     <div className="relative">
-      <LouvreMuseum3D artworks={artworks} onArtworkClick={handleArtworkClick} />
+      <LouvreMuseum3DNew artworks={artworks} onArtworkClick={handleArtworkClick} />
 
       {/* Back button */}
       <Button
