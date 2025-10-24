@@ -36,8 +36,8 @@ export default function LouvreMuseum3D({
 
     // Setup Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a0a2e); // Viola scuro
-    scene.fog = new THREE.Fog(0x1a0a2e, 50, 150);
+    scene.background = new THREE.Color(0x2a1a4a); // Viola più chiaro
+    scene.fog = new THREE.Fog(0x2a1a4a, 80, 200);
 
     // Camera
     const camera = new THREE.PerspectiveCamera(
@@ -89,10 +89,10 @@ export default function LouvreMuseum3D({
     });
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(0x6a0dad, 0.4);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
-    const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
     mainLight.position.set(10, 20, 10);
     mainLight.castShadow = true;
     mainLight.shadow.camera.left = -50;
@@ -113,9 +113,9 @@ export default function LouvreMuseum3D({
     // Floor (pavimento del museo)
     const floorGeometry = new THREE.PlaneGeometry(100, 100);
     const floorMaterial = new THREE.MeshStandardMaterial({
-      color: 0x2a1a4a,
-      roughness: 0.8,
-      metalness: 0.2,
+      color: 0x4a3a6a,
+      roughness: 0.7,
+      metalness: 0.3,
     });
     const floor = new THREE.Mesh(floorGeometry, floorMaterial);
     floor.rotation.x = -Math.PI / 2;
@@ -123,7 +123,7 @@ export default function LouvreMuseum3D({
     scene.add(floor);
 
     // Grid pattern sul pavimento
-    const gridHelper = new THREE.GridHelper(100, 50, 0x6a0dad, 0x4a0a8a);
+    const gridHelper = new THREE.GridHelper(100, 50, 0x8a5ada, 0x6a3aba);
     gridHelper.position.y = 0.01;
     scene.add(gridHelper);
 
@@ -156,13 +156,15 @@ export default function LouvreMuseum3D({
       x: number,
       y: number,
       z: number,
-      color: number = 0x3a2a5a
+      color: number = 0x6a5a8a
     ): THREE.Mesh {
       const geometry = new THREE.BoxGeometry(width, height, depth);
       const material = new THREE.MeshStandardMaterial({
         color,
-        roughness: 0.7,
-        metalness: 0.3,
+        roughness: 0.6,
+        metalness: 0.2,
+        emissive: color,
+        emissiveIntensity: 0.1,
       });
       const wall = new THREE.Mesh(geometry, material);
       wall.position.set(x, y, z);
@@ -184,8 +186,10 @@ export default function LouvreMuseum3D({
     // Soffitto con lucernari
     const ceilingGeometry = new THREE.PlaneGeometry(gallerieWidth, gallerieLength);
     const ceilingMaterial = new THREE.MeshStandardMaterial({
-      color: 0x4a3a6a,
+      color: 0x5a4a7a,
       side: THREE.DoubleSide,
+      emissive: 0x3a2a5a,
+      emissiveIntensity: 0.2,
     });
     const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
     ceiling.rotation.x = Math.PI / 2;
@@ -218,12 +222,12 @@ export default function LouvreMuseum3D({
     const salleX = 20;
     const salleZ = -15;
 
-    // Muri della Salle des États
+    // Muri della Salle des États (più chiari)
     const salleWalls = [
-      createWall(2, wallHeight, salleDepth, salleX - salleWidth / 2, wallHeight / 2, salleZ, 0x5a2a7a),
-      createWall(2, wallHeight, salleDepth, salleX + salleWidth / 2, wallHeight / 2, salleZ, 0x5a2a7a),
-      createWall(salleWidth, wallHeight, 2, salleX, wallHeight / 2, salleZ - salleDepth / 2, 0x5a2a7a),
-      createWall(salleWidth, wallHeight, 2, salleX, wallHeight / 2, salleZ + salleDepth / 2, 0x5a2a7a),
+      createWall(2, wallHeight, salleDepth, salleX - salleWidth / 2, wallHeight / 2, salleZ, 0x7a4a9a),
+      createWall(2, wallHeight, salleDepth, salleX + salleWidth / 2, wallHeight / 2, salleZ, 0x7a4a9a),
+      createWall(salleWidth, wallHeight, 2, salleX, wallHeight / 2, salleZ - salleDepth / 2, 0x7a4a9a),
+      createWall(salleWidth, wallHeight, 2, salleX, wallHeight / 2, salleZ + salleDepth / 2, 0x7a4a9a),
     ];
     salleWalls.forEach((wall) => scene.add(wall));
 
@@ -235,15 +239,15 @@ export default function LouvreMuseum3D({
 
     // Ala Denon (destra)
     const denonWalls = [
-      createWall(2, wallHeight, 30, 20, wallHeight / 2, 15, 0x4a2a6a),
-      createWall(2, wallHeight, 30, 30, wallHeight / 2, 15, 0x4a2a6a),
+      createWall(2, wallHeight, 30, 20, wallHeight / 2, 15, 0x6a4a8a),
+      createWall(2, wallHeight, 30, 30, wallHeight / 2, 15, 0x6a4a8a),
     ];
     denonWalls.forEach((wall) => scene.add(wall));
 
     // Ala Richelieu (sinistra)
     const richelieuWalls = [
-      createWall(2, wallHeight, 30, -20, wallHeight / 2, 15, 0x4a2a6a),
-      createWall(2, wallHeight, 30, -30, wallHeight / 2, 15, 0x4a2a6a),
+      createWall(2, wallHeight, 30, -20, wallHeight / 2, 15, 0x6a4a8a),
+      createWall(2, wallHeight, 30, -30, wallHeight / 2, 15, 0x6a4a8a),
     ];
     richelieuWalls.forEach((wall) => scene.add(wall));
 
@@ -257,8 +261,10 @@ export default function LouvreMuseum3D({
       for (let i = 0; i < stepCount; i++) {
         const stepGeometry = new THREE.BoxGeometry(stepWidth, stepHeight, stepDepth);
         const stepMaterial = new THREE.MeshStandardMaterial({
-          color: 0x2a1a4a,
-          roughness: 0.9,
+          color: 0x5a4a7a,
+          roughness: 0.8,
+          emissive: 0x3a2a5a,
+          emissiveIntensity: 0.1,
         });
         const step = new THREE.Mesh(stepGeometry, stepMaterial);
         step.position.set(x, i * stepHeight, z + i * stepDepth);
