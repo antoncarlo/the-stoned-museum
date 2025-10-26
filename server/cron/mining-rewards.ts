@@ -148,8 +148,10 @@ async function processMiningRewards() {
   }
 }
 
+export { processMiningRewards };
+
 // Run if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   processMiningRewards()
     .then(() => process.exit(0))
     .catch((error) => {
@@ -157,6 +159,4 @@ if (require.main === module) {
       process.exit(1);
     });
 }
-
-export { processMiningRewards };
 

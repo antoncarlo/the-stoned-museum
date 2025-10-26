@@ -129,8 +129,10 @@ async function processStakingRewards() {
   }
 }
 
+export { processStakingRewards };
+
 // Run if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   processStakingRewards()
     .then(() => process.exit(0))
     .catch((error) => {
@@ -138,6 +140,4 @@ if (require.main === module) {
       process.exit(1);
     });
 }
-
-export { processStakingRewards };
 
