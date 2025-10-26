@@ -7,6 +7,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { initializeCronJobs } from "../cron/scheduler";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -59,6 +60,15 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // Initialize cron jobs in production
+    if (process.env.NODE_ENV === "production") {
+      initializeCronJobs();
+    } else {
+      console.log("\n⚠️  Cron jobs disabled in development mode");
+      console.log("   To test cron jobs, run: pnpm tsx server/cron/mining-rewards.ts");
+      console.log("   Or: pnpm tsx server/cron/staking-rewards.ts\n");
+    }
   });
 }
 

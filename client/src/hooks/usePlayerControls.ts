@@ -26,6 +26,17 @@ export function usePlayerControls() {
   controlsRef.current = controls;
 
   useEffect(() => {
+    // Reset controls state on mount
+    setControls({
+      moveForward: false,
+      moveBackward: false,
+      moveLeft: false,
+      moveRight: false,
+      mouseX: 0,
+      mouseY: 0,
+      isPointerLocked: false,
+    });
+
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.code) {
         case 'KeyW':
@@ -85,16 +96,21 @@ export function usePlayerControls() {
       }));
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('pointerlockchange', handlePointerLockChange);
+    // Add event listeners
+    document.addEventListener('keydown', handleKeyDown, true);
+    document.addEventListener('keyup', handleKeyUp, true);
+    document.addEventListener('mousemove', handleMouseMove, true);
+    document.addEventListener('pointerlockchange', handlePointerLockChange, true);
+
+    // Log for debugging
+    console.log('[usePlayerControls] Event listeners registered');
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('keyup', handleKeyUp);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('pointerlockchange', handlePointerLockChange);
+      document.removeEventListener('keydown', handleKeyDown, true);
+      document.removeEventListener('keyup', handleKeyUp, true);
+      document.removeEventListener('mousemove', handleMouseMove, true);
+      document.removeEventListener('pointerlockchange', handlePointerLockChange, true);
+      console.log('[usePlayerControls] Event listeners removed');
     };
   }, []);
 

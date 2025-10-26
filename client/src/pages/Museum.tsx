@@ -56,7 +56,15 @@ export default function Museum() {
   const selectedArtworkData = artworks.find((a) => a.id === selectedArtwork);
 
   if (showIntro) {
-    return <LouvreIntro onComplete={() => setShowIntro(false)} />;
+    return <LouvreIntro onComplete={() => {
+      setShowIntro(false);
+      // Small delay to ensure 3D component is mounted before enabling controls
+      setTimeout(() => {
+        console.log('[Museum] Intro completed, controls should be active');
+        // Focus on document to ensure keyboard events are captured
+        document.body.focus();
+      }, 100);
+    }} />;
   }
 
   return (

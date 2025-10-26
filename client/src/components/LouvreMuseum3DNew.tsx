@@ -117,13 +117,22 @@ export default function LouvreMuseum3DNew({
     const moveSpeed = 0.5; // Aumentato da 0.2 a 0.5 per movimento più veloce
     const keys: { [key: string]: boolean } = {};
 
-    window.addEventListener("keydown", (e) => {
-      keys[e.key.toLowerCase()] = true;
-    });
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+      keys[key] = true;
+      console.log(`[LouvreMuseum3D] Key down: ${key}`, keys);
+    };
 
-    window.addEventListener("keyup", (e) => {
-      keys[e.key.toLowerCase()] = false;
-    });
+    const handleKeyUp = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+      keys[key] = false;
+      console.log(`[LouvreMuseum3D] Key up: ${key}`, keys);
+    };
+
+    // Use document instead of window for better event capture
+    document.addEventListener("keydown", handleKeyDown, true);
+    document.addEventListener("keyup", handleKeyUp, true);
+    console.log('[LouvreMuseum3D] Keyboard event listeners registered');
 
     // Lighting - Luce naturale del Louvre
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
@@ -594,6 +603,9 @@ export default function LouvreMuseum3DNew({
     return () => {
       window.removeEventListener("resize", onWindowResize);
       window.removeEventListener("click", onMouseClick);
+      document.removeEventListener("keydown", handleKeyDown, true);
+      document.removeEventListener("keyup", handleKeyUp, true);
+      console.log('[LouvreMuseum3D] Keyboard event listeners removed');
       if (controls) {
         controls.dispose();
       }
