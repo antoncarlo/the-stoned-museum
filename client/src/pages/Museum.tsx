@@ -1,4 +1,5 @@
-import LouvreGameSimple from "@/components/LouvreGameSimple";
+import LouvreMuseum3DNew from "@/components/LouvreMuseum3DNew";
+import LouvreIntro from "@/components/LouvreIntro";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +8,7 @@ import { useLocation } from "wouter";
 export default function Museum() {
   const [, setLocation] = useLocation();
   const [selectedArtwork, setSelectedArtwork] = useState<string | null>(null);
-
+  const [showIntro, setShowIntro] = useState(true);
 
   // Mock artworks posizionati nel museo
   const artworks = [
@@ -54,16 +55,13 @@ export default function Museum() {
 
   const selectedArtworkData = artworks.find((a) => a.id === selectedArtwork);
 
-  // 3 opere starter per tutti i nuovi utenti
-  const starterArtworks = [
-    { id: "starter-1", name: "Genesis", artist: "Unknown", rarity: "Common", farmRate: 10 },
-    { id: "starter-2", name: "Origins", artist: "Unknown", rarity: "Common", farmRate: 10 },
-    { id: "starter-3", name: "Beginning", artist: "Unknown", rarity: "Common", farmRate: 10 },
-  ];
+  if (showIntro) {
+    return <LouvreIntro onComplete={() => setShowIntro(false)} />;
+  }
 
   return (
     <div className="relative">
-      <LouvreGameSimple userArtworks={starterArtworks} onArtworkClick={handleArtworkClick} />
+      <LouvreMuseum3DNew artworks={artworks} onArtworkClick={handleArtworkClick} />
 
       {/* Back button */}
       <Button
