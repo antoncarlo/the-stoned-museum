@@ -4,7 +4,7 @@
 - [x] Popup istruzioni non si chiude e blocca il gioco nel museo
 - [x] Popup riappare ogni 10 secondi in loop infinito (rimosso re-show su unlock)
 - [x] Movimento giocatore troppo lento (aumentato da 0.2 a 0.5)
-- [ ] Mouse/cursore non ruota la camera (destra/sinistra non funziona) - da testare
+- [x] Mouse/cursore non ruota la camera (fixato con useRef per evitare closure stale)
 - [ ] Controlli movimento non funzionano dopo l'intro
 
 ## Miglioramenti Qualità (Polish)

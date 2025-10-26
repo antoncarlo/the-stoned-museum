@@ -33,8 +33,19 @@ export default function LouvreMuseum3DNew({
 }: LouvreMuseum3DNewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLocked, setIsLocked] = useState(false);
+  const isLockedRef = useRef(false); // Ref per evitare closure stale
   const [instructions, setInstructions] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Auto-hide istruzioni dopo 5 secondi
+  useEffect(() => {
+    if (instructions && !isMobile) {
+      const timer = setTimeout(() => {
+        setInstructions(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [instructions, isMobile]);
   const [currentRoom, setCurrentRoom] = useState("Cour Napoléon");
   const touchMoveRef = useRef({ x: 0, y: 0 });
   const touchLookRef = useRef({ deltaX: 0, deltaY: 0 });
@@ -83,16 +94,19 @@ export default function LouvreMuseum3DNew({
 
       controls.addEventListener("lock", () => {
         setIsLocked(true);
+        isLockedRef.current = true;
         setInstructions(false);
       });
 
       controls.addEventListener("unlock", () => {
         setIsLocked(false);
-        setInstructions(true);
+        isLockedRef.current = false;
+        // NON riattivare le istruzioni quando si fa ESC
       });
 
       const handleClick = () => {
-        if (!isLocked && controls) {
+        // Usa ref invece di state per evitare closure stale
+        if (!isLockedRef.current && controls) {
           controls.lock();
         }
       };
@@ -100,7 +114,7 @@ export default function LouvreMuseum3DNew({
     }
 
     // Movement
-    const moveSpeed = 0.2;
+    const moveSpeed = 0.5; // Aumentato da 0.2 a 0.5 per movimento più veloce
     const keys: { [key: string]: boolean } = {};
 
     window.addEventListener("keydown", (e) => {
@@ -605,17 +619,23 @@ export default function LouvreMuseum3DNew({
       )}
       
       {instructions && !isMobile && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-10">
+        <div 
+          className="absolute inset-0 flex items-center justify-center bg-black/70 z-10 cursor-pointer"
+          onClick={() => setInstructions(false)}
+        >
           <div className="text-center text-white p-8 bg-gradient-to-br from-amber-900/90 to-yellow-900/90 rounded-lg border-2 border-amber-500">
             <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-amber-200 to-yellow-200 bg-clip-text text-transparent">
               Musée du Louvre
             </h2>
-            <p className="text-lg mb-2">Click to enter the museum</p>
+            <p className="text-lg mb-2">Click anywhere to enter the museum</p>
             <p className="text-sm text-gray-300 mb-4">
               Use WASD to move • Mouse to look around
             </p>
             <p className="text-xs text-amber-300">
               Explore the 3 wings and discover NFT artworks
+            </p>
+            <p className="text-xs text-gray-500 mt-4">
+              (Auto-closes in 5 seconds)
             </p>
           </div>
         </div>
