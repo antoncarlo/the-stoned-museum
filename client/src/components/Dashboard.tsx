@@ -6,6 +6,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { gameService, type UserProfile, type ArtworkNFT } from "@/lib/gameService";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 export default function Dashboard() {
   const { publicKey, connected } = useWallet();
@@ -289,14 +290,26 @@ export default function Dashboard() {
             >
               🏛️ Enter Museum (3D)
             </Button>
-            <Button variant="outline" className="w-full justify-start border-purple-500/50 text-white hover:bg-purple-900/30">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start border-purple-500/50 text-white hover:bg-purple-900/30"
+              onClick={() => setLocation("/marketplace")}
+            >
               🛒 Marketplace
             </Button>
-            <Button variant="outline" className="w-full justify-start border-purple-500/50 text-white hover:bg-purple-900/30">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start border-purple-500/50 text-white hover:bg-purple-900/30"
+              onClick={() => setLocation("/staking")}
+            >
               💎 Staking
             </Button>
-            <Button variant="outline" className="w-full justify-start border-purple-500/50 text-white hover:bg-purple-900/30">
-              🎯 Quests
+            <Button 
+              variant="outline" 
+              className="w-full justify-start border-purple-500/50 text-white hover:bg-purple-900/30"
+              onClick={() => setLocation("/inventory")}
+            >
+              🎨 Inventory
             </Button>
           </CardContent>
         </Card>
