@@ -17,16 +17,8 @@
 
 ## Feature da Completare
 - [ ] Integrare texture reali del Louvre (già salvate in /client/public/models/)
-- [ ] Marketplace UI funzionante - implementing now
-  - [ ] Connessione backend tRPC
-  - [ ] Filtri per rarità funzionanti
-  - [ ] Compra/vendi opere NFT
-  - [ ] Listing management
-- [ ] Staking UI funzionante - implementing now
-  - [ ] Connessione backend tRPC
-  - [ ] Stake/unstake $MUSEUM
-  - [ ] Calcolo rewards in tempo reale
-  - [ ] Claim rewards
+- [ ] Marketplace UI funzionante (vedi ROADMAP.md per dettagli)
+- [ ] Staking UI funzionante (vedi ROADMAP.md per dettagli)
 - [ ] Integrazione Honeycomb Protocol
 - [ ] Sistema Heist Mode (livello 10+)
 
