@@ -31,11 +31,32 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  
+  // Health check endpoint for Railway
+  app.get("/health", (_req, res) => {
+    res.status(200).json({ 
+      status: "ok", 
+      timestamp: new Date().toISOString(),
+      env: process.env.NODE_ENV 
+    });
+  });
+  
+  // Basic ping endpoint
+  app.get("/ping", (_req, res) => {
+    res.status(200).send("pong");
+  });
+  
   // OAuth callback under /api/oauth/callback
-  registerOAuthRoutes(app);
+  try {
+    registerOAuthRoutes(app);
+  } catch (error) {
+    console.error("Error registering OAuth routes:", error);
+  }
+  
   // tRPC API
   app.use(
     "/api/trpc",
@@ -44,6 +65,7 @@ async function startServer() {
       createContext,
     })
   );
+  
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
@@ -55,15 +77,29 @@ async function startServer() {
 
   server.listen(port, "0.0.0.0", () => {
     console.log(`Server running on http://0.0.0.0:${port}/`);
+    console.log(`Health check available at: http://0.0.0.0:${port}/health`);
     
-    // Initialize cron jobs in production
+    // Initialize cron jobs in production AFTER server is ready
     if (process.env.NODE_ENV === "production") {
-      initializeCronJobs();
+      setTimeout(() => {
+        try {
+          console.log("Initializing cron jobs...");
+          initializeCronJobs();
+          console.log("Cron jobs initialized successfully");
+        } catch (error) {
+          console.error("Error initializing cron jobs:", error);
+        }
+      }, 2000); // Wait 2 seconds after server start
     } else {
       console.log("\n⚠️  Cron jobs disabled in development mode");
       console.log("   To test cron jobs, run: pnpm tsx server/cron/mining-rewards.ts");
       console.log("   Or: pnpm tsx server/cron/staking-rewards.ts\n");
     }
+  });
+  
+  // Handle server errors
+  server.on("error", (error) => {
+    console.error("Server error:", error);
   });
 }
 
