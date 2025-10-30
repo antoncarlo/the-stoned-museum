@@ -73,7 +73,10 @@ async function startServer() {
     serveStatic(app);
   }
 
-  const port = parseInt(process.env.PORT || "3000");
+  const envPort = process.env.PORT;
+  const railwayPort = process.env.RAILWAY_PORT;
+  console.log(`[Port] ENV PORT=${envPort ?? '(undefined)'} RAILWAY_PORT=${railwayPort ?? '(undefined)'}`);
+  const port = parseInt(envPort ?? railwayPort ?? "8080", 10);
 
   server.listen(port, "0.0.0.0", () => {
     console.log(`Server running on http://0.0.0.0:${port}/`);

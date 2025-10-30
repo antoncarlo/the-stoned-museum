@@ -33,7 +33,9 @@ DATABASE_URL=mysql://username:password@host:port/database_name
 JWT_SECRET=your-super-secure-jwt-secret-minimum-32-characters
 
 # Infrastructure
-PORT=3000
+# Nota: su Railway l'app dovrebbe ascoltare sulla porta fornita dall'ambiente.
+# Il server ora usa `PORT` (se presente), poi `RAILWAY_PORT`, con default a 8080.
+# In genere NON serve impostare manualmente `PORT` su Railway.
 NODE_ENV=production
 ```
 
@@ -189,4 +191,4 @@ If deployment issues persist:
 
 **Last Updated**: October 30, 2025  
 **Version**: 1.0  
-**Status**: Ready for Deployment ✅
+**Status**: Ready for Deployment ✅y
