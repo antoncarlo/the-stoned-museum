@@ -83,11 +83,11 @@ async function processMiningRewards() {
     connection = await mysql.createConnection(DATABASE_URL);
     const db = drizzle(connection);
 
-    // Get all users with Museum Pass
+    // Get all users with Museum Pass (museumPassMint not null)
     const allUsers = await db
       .select()
       .from(users)
-      .where(eq(users.hasMuseumPass, true));
+      .where(isNotNull(users.museumPassMint));
 
     console.log(`Found ${allUsers.length} users with Museum Pass\n`);
 
