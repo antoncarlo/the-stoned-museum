@@ -53,25 +53,37 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  // In production, the built client files are emitted to dist/public
-  // After bundling the server into dist/index.js, __dirname points to dist/
-  // so we resolve dist/public relative to __dirname without going up a level
-  const distPath = path.resolve(__dirname, "public");
-  
-  console.log(`[Static Files] Looking for files in: ${distPath}`);
+  // Resolve candidate locations for built client assets.
+  // Handles different bundling outcomes where __dirname may point to /app or /app/dist.
+  const candidates = [
+    path.resolve(__dirname, "public"),
+    path.resolve(__dirname, "dist", "public"),
+    path.resolve(process.cwd(), "dist", "public"),
+    path.resolve(process.cwd(), "public"),
+  ];
+
+  let distPath: string | undefined;
+  for (const p of candidates) {
+    if (fs.existsSync(p)) {
+      distPath = p;
+      break;
+    }
+  }
+
   console.log(`[Static Files] __dirname is: ${__dirname}`);
   console.log(`[Static Files] NODE_ENV is: ${process.env.NODE_ENV}`);
-  console.log(`[Static Files] Resolved path: ${path.resolve(distPath)}`);
+  console.log(`[Static Files] Candidate paths: ${candidates.join(' | ')}`);
+  console.log(`[Static Files] Selected path: ${distPath ?? '(none found)'}`);
   
-  if (!fs.existsSync(distPath)) {
+  if (!distPath || !fs.existsSync(distPath)) {
     console.error(
-      `❌ Could not find the build directory: ${distPath}`
+      `❌ Could not find the build directory in any candidate path`
     );
     console.error(`   Make sure to run 'pnpm run build' first`);
     console.error(`   Expected structure: dist/public/ with index.html and assets/`);
     
     // List what's actually in the dist directory for debugging
-    const distRoot = path.resolve(__dirname, "..");
+    const distRoot = path.resolve(process.cwd(), "dist");
     if (fs.existsSync(distRoot)) {
       console.log(`📁 Contents of ${distRoot}:`);
       try {
@@ -96,11 +108,11 @@ export function serveStatic(app: Express) {
     }
   }
 
-  app.use(express.static(distPath));
+  app.use(express.static(distPath ?? path.resolve(process.cwd(), "dist", "public")));
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {
-    const indexPath = path.resolve(distPath, "index.html");
+    const indexPath = path.resolve((distPath ?? path.resolve(process.cwd(), "dist", "public")), "index.html");
     if (fs.existsSync(indexPath)) {
       res.sendFile(indexPath);
     } else {
