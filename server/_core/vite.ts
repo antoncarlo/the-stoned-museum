@@ -56,7 +56,7 @@ export function serveStatic(app: Express) {
   const distPath =
     process.env.NODE_ENV === "development"
       ? path.resolve(__dirname, "../..", "dist", "public")
-      : path.resolve(__dirname, "..", "public");
+      : path.resolve(__dirname, "public");
   
   console.log(`[Static Files] Looking for files in: ${distPath}`);
   console.log(`[Static Files] __dirname is: ${__dirname}`);
