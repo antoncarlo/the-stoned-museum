@@ -53,9 +53,10 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  // In production, the built files are in dist/public relative to project root
-  // __dirname points to dist/_core/ after build, so we go up two levels to reach dist/public
-  const distPath = path.resolve(__dirname, "..", "public");
+  // In production, the built client files are emitted to dist/public
+  // After bundling the server into dist/index.js, __dirname points to dist/
+  // so we resolve dist/public relative to __dirname without going up a level
+  const distPath = path.resolve(__dirname, "public");
   
   console.log(`[Static Files] Looking for files in: ${distPath}`);
   console.log(`[Static Files] __dirname is: ${__dirname}`);
